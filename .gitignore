@@ -1,0 +1,69 @@
+# Python-related ignores
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.env
+*.venv
+venv/
+ENV/
+env/
+*.egg-info/
+dist/
+build/
+
+# Flask-related ignores
+instance/
+*.sqlite3
+*.db
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Logs and debug files
+*.log
+*.out
+*.err
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE-specific files
+.vscode/
+.idea/
+
+# CSV files (uploaded data)
+*.csv
+
+# Tailwind CSS cache
+.tailwindcss/
+
+# Ignore compiled files
+*.so
+*.dll
+
+# Ignore coverage reports
+.coverage
+*.cover
+coverage.xml
+htmlcov/
+
+# Ignore test artifacts
+nosetests.xml
+pytest_cache/
+.tox/
+.cache/
+junit.xml
+
+# Ignore temporary files
+*.tmp
+*.swp
+*.swo
+*.bak
+*.old
+
+# Ignore generated files
+*.html
+*.js
+*.css
