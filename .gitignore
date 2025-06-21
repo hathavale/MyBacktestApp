@@ -62,8 +62,3 @@ junit.xml
 *.swo
 *.bak
 *.old
-
-# Ignore generated files
-*.html
-*.js
-*.css

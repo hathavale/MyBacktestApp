@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backtrader Flask App</title>
+    <!-- Link to Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles to enhance Tailwind defaults and ensure responsiveness */
+        body {
+            font-family: 'Inter', sans-serif; /* Use Inter font for a modern look */
+            background-color: #f0f2f5; /* Light grey background */
+            display: flex;
+            justify-content: center; /* Center content horizontally */
+            align-items: flex-start; /* Align content to the top vertically */
+            min-height: 100vh; /* Ensure body takes full viewport height */
+            padding: 2rem; /* Padding around the content */
+            box-sizing: border-box; /* Include padding in element's total width and height */
+        }
+        .container {
+            background-color: #ffffff; /* White background for the main container */
+            padding: 2.5rem; /* Internal padding */
+            border-radius: 1rem; /* Rounded corners */
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+            width: 100%; /* Full width within its parent */
+            max-width: 800px; /* Maximum width for larger screens */
+        }
+        .form-group label {
+            display: block; /* Make labels block-level elements */
+            margin-bottom: 0.5rem; /* Space below labels */
+            font-weight: 600; /* Semi-bold text */
+            color: #333; /* Dark grey text color */
+        }
+        .form-group input[type="number"],
+        .form-group input[type="file"] {
+            width: 100%; /* Full width for inputs */
+            padding: 0.75rem; /* Internal padding */
+            border: 1px solid #d1d5db; /* Light grey border */
+            border-radius: 0.5rem; /* Rounded corners */
+            font-size: 1rem; /* Standard font size */
+            box-sizing: border-box; /* Include padding in element's total width and height */
+            transition: border-color 0.2s; /* Smooth transition for border focus */
+        }
+        .form-group input[type="number"]:focus,
+        .form-group input[type="file"]:focus {
+            outline: none; /* Remove default outline */
+            border-color: #3b82f6; /* Blue border on focus */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); /* Blue glow on focus */
+        }
+        .submit-button {
+            background-color: #3b82f6; /* Blue background */
+            color: white; /* White text */
+            padding: 0.75rem 1.5rem; /* Padding for the button */
+            border-radius: 0.5rem; /* Rounded corners */
+            font-size: 1.1rem; /* Larger font size */
+            font-weight: 600; /* Semi-bold text */
+            cursor: pointer; /* Pointer cursor on hover */
+            transition: background-color 0.2s ease-in-out; /* Smooth transition for hover effect */
+            border: none; /* No border */
+            width: auto; /* Auto width */
+            display: inline-block; /* Display as inline-block */
+        }
+        .submit-button:hover {
+            background-color: #2563eb; /* Darker blue on hover */
+        }
+        .results-section {
+            margin-top: 2rem; /* Space above results section */
+            padding-top: 1.5rem; /* Padding above top border */
+            border-top: 1px solid #e5e7eb; /* Light grey top border */
+        }
+        .results-section h2 {
+            font-size: 1.75rem; /* Larger heading font size */
+            font-weight: 700; /* Bold heading */
+            color: #1f2937; /* Dark grey heading text */
+            margin-bottom: 1rem; /* Space below heading */
+        }
+        .results-section p {
+            margin-bottom: 0.5rem; /* Space below paragraphs */
+            font-size: 1.1rem; /* Standard paragraph font size */
+            color: #4b5563; /* Medium grey text color */
+        }
+        .results-section p strong {
+            color: #1f2937; /* Darker text for strong elements */
+        }
+        /* Styling for error messages */
+        .error-message {
+            color: #dc2626; /* Red text */
+            background-color: #fee2e2; /* Light red background */
+            padding: 1rem; /* Padding */
+            border-radius: 0.5rem; /* Rounded corners */
+            margin-top: 1rem; /* Space above */
+            border: 1px solid #ef4444; /* Red border */
+        }
+        /* Styling for success messages */
+        .success-message {
+            color: #16a34a; /* Green text */
+            background-color: #dcfce7; /* Light green background */
+            padding: 1rem; /* Padding */
+            border-radius: 0.5rem; /* Rounded corners */
+            margin-top: 1rem; /* Space above */
+            border: 1px solid #22c55e; /* Green border */
+        }
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 640px) {
+            .container {
+                padding: 1.5rem; /* Smaller padding on small screens */
+            }
+            .form-group {
+                margin-bottom: 1rem; /* Smaller margin for form groups */
+            }
+            .form-group label {
+                margin-bottom: 0.25rem; /* Smaller margin for labels */
+            }
+            .form-group input[type="number"],
+            .form-group input[type="file"] {
+                padding: 0.6rem; /* Smaller input padding */
+                font-size: 0.9rem; /* Smaller input font size */
+            }
+            .submit-button {
+                padding: 0.6rem 1.2rem; /* Smaller button padding */
+                font-size: 1rem; /* Smaller button font size */
+                width: 100%; /* Full width button on small screens */
+            }
+            .results-section h2 {
+                font-size: 1.5rem; /* Smaller heading font size */
+            }
+            .results-section p {
+                font-size: 1rem; /* Smaller paragraph font size */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Backtrader Flask Application</h1>
+        <p class="text-center text-gray-600 mb-8">Upload historical stock data (CSV) and run a simple SMA Crossover backtest.</p>
+
+        <!-- Form for file upload and parameter input -->
+        <form action="/run_backtest" method="post" enctype="multipart/form-data" class="space-y-6">
+            <div class="form-group">
+                <label for="data_file" class="block text-sm font-medium text-gray-700">Upload CSV Data:</label>
+                <input type="file" name="data_file" id="data_file" accept=".csv" required
+                       class="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none focus:border-blue-500">
+                <p class="mt-1 text-xs text-gray-500">
+                    Expected CSV columns (case-sensitive): <strong>Date, Open, High, Low, Close, Volume, OpenInterest</strong>.
+                    Ensure 'Date' column is in a parseable format (e.g., YYYY-MM-DD).
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-group">
+                    <label for="fast_period" class="block text-sm font-medium text-gray-700">Fast SMA Period:</label>
+                    <input type="number" name="fast_period" id="fast_period" value="10" min="1" required
+                           class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                </div>
+
+                <div class="form-group">
+                    <label for="slow_period" class="block text-sm font-medium text-gray-700">Slow SMA Period:</label>
+                    <input type="number" name="slow_period" id="slow_period" value="30" min="1" required
+                           class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                </div>
+            </div>
+
+            <div class="flex justify-center mt-8">
+                <button type="submit" class="submit-button">Run Backtest</button>
+            </div>
+        </form>
+
+        <!-- Display results section if results are available -->
+        {% if results %}
+            <div class="results-section">
+                {% if results.error %}
+                    <!-- Error message display -->
+                    <div class="error-message">
+                        <p class="font-bold">Error:</p>
+                        <p>{{ results.message }}</p>
+                    </div>
+                {% else %}
+                    <!-- Success message and backtest summary -->
+                    <div class="success-message">
+                        <p class="font-bold">Backtest Results:</p>
+                        <p>{{ results.message }}</p>
+                    </div>
+                    <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Summary:</h3>
+                        <p><strong>Initial Portfolio Value:</strong> {{ results.initial_value }}</p>
+                        <p><strong>Final Portfolio Value:</strong> {{ results.final_value }}</p>
+                        <p><strong>Profit/Loss:</strong> {{ results.profit }}</p>
+                        <p><strong>Profit/Loss Percentage:</strong> {{ results.profit_percent }}</p>
+                        <p><strong>Fast SMA Period:</strong> {{ results.fast_period }}</p>
+                        <p><strong>Slow SMA Period:</strong> {{ results.slow_period }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
