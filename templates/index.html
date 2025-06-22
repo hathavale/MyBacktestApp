@@ -425,29 +425,32 @@
     </div>
     <script>
         function toggleParameters() {
+            console.log('Toggling parameters for strategy:', document.getElementById('strategy').value);
             const strategy = document.getElementById('strategy').value;
             const paramDivs = document.querySelectorAll('.strategy-params');
             paramDivs.forEach(div => {
                 div.classList.add('hidden');
+                console.log('Hiding:', div.id);
             });
             const activeDiv = document.getElementById('params-' + strategy);
             if (activeDiv) {
                 activeDiv.classList.remove('hidden');
+                console.log('Showing:', activeDiv.id);
+            } else {
+                console.error('No params div found for strategy:', strategy);
             }
         }
 
+        // Initialize event listeners
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, initializing parameters');
             toggleParameters();
-            const strategy = document.getElementById('strategy');
-            if (strategy) {
-                strategy.addEventListener('change', toggleParameters);
+            const strategySelect = document.getElementById('strategy');
+            if (strategySelect) {
+                strategySelect.addEventListener('change', toggleParameters);
+            } else {
+                console.error('Strategy select element not found');
             }
-        });
-    </script>
-    <script>
-        // Ensure the correct strategy parameters are shown on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            toggleParameters();
         });
     </script>
 </body>
