@@ -4,129 +4,149 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Backtrader Flask App</title>
-    <!-- Link to Tailwind CSS CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Custom styles to enhance Tailwind defaults and ensure responsiveness */
         body {
-            font-family: 'Inter', sans-serif; /* Use Inter font for a modern look */
-            background-color: #f0f2f5; /* Light grey background */
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
             display: flex;
-            justify-content: center; /* Center content horizontally */
-            align-items: flex-start; /* Align content to the top vertically */
-            min-height: 100vh; /* Ensure body takes full viewport height */
-            padding: 2rem; /* Padding around the content */
-            box-sizing: border-box; /* Include padding in element's total width and height */
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 2rem;
+            box-sizing: border-box;
         }
         .container {
-            background-color: #ffffff; /* White background for the main container */
-            padding: 2.5rem; /* Internal padding */
-            border-radius: 1rem; /* Rounded corners */
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-            width: 100%; /* Full width within its parent */
-            max-width: 800px; /* Maximum width for larger screens */
+            background-color: #ffffff;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
         }
         .form-group label {
-            display: block; /* Make labels block-level elements */
-            margin-bottom: 0.5rem; /* Space below labels */
-            font-weight: 600; /* Semi-bold text */
-            color: #333; /* Dark grey text color */
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
         }
         .form-group input[type="number"],
-        .form-group input[type="file"] {
-            width: 100%; /* Full width for inputs */
-            padding: 0.75rem; /* Internal padding */
-            border: 1px solid #d1d5db; /* Light grey border */
-            border-radius: 0.5rem; /* Rounded corners */
-            font-size: 1rem; /* Standard font size */
-            box-sizing: border-box; /* Include padding in element's total width and height */
-            transition: border-color 0.2s; /* Smooth transition for border focus */
+        .form-group input[type="file"],
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
         }
         .form-group input[type="number"]:focus,
-        .form-group input[type="file"]:focus {
-            outline: none; /* Remove default outline */
-            border-color: #3b82f6; /* Blue border on focus */
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); /* Blue glow on focus */
+        .form-group input[type="file"]:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
         }
         .submit-button {
-            background-color: #3b82f6; /* Blue background */
-            color: white; /* White text */
-            padding: 0.75rem 1.5rem; /* Padding for the button */
-            border-radius: 0.5rem; /* Rounded corners */
-            font-size: 1.1rem; /* Larger font size */
-            font-weight: 600; /* Semi-bold text */
-            cursor: pointer; /* Pointer cursor on hover */
-            transition: background-color 0.2s ease-in-out; /* Smooth transition for hover effect */
-            border: none; /* No border */
-            width: auto; /* Auto width */
-            display: inline-block; /* Display as inline-block */
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            border: none;
+            width: auto;
+            display: inline-block;
         }
         .submit-button:hover {
-            background-color: #2563eb; /* Darker blue on hover */
+            background-color: #2563eb;
         }
         .results-section {
-            margin-top: 2rem; /* Space above results section */
-            padding-top: 1.5rem; /* Padding above top border */
-            border-top: 1px solid #e5e7eb; /* Light grey top border */
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e5e7eb;
         }
         .results-section h2 {
-            font-size: 1.75rem; /* Larger heading font size */
-            font-weight: 700; /* Bold heading */
-            color: #1f2937; /* Dark grey heading text */
-            margin-bottom: 1rem; /* Space below heading */
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1rem;
         }
         .results-section p {
-            margin-bottom: 0.5rem; /* Space below paragraphs */
-            font-size: 1.1rem; /* Standard paragraph font size */
-            color: #4b5563; /* Medium grey text color */
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            color: #4b5563;
         }
         .results-section p strong {
-            color: #1f2937; /* Darker text for strong elements */
+            color: #1f2937;
         }
-        /* Styling for error messages */
         .error-message {
-            color: #dc2626; /* Red text */
-            background-color: #fee2e2; /* Light red background */
-            padding: 1rem; /* Padding */
-            border-radius: 0.5rem; /* Rounded corners */
-            margin-top: 1rem; /* Space above */
-            border: 1px solid #ef4444; /* Red border */
+            color: #dc2626;
+            background-color: #fee2e2;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            border: 1px solid #ef4444;
         }
-        /* Styling for success messages */
         .success-message {
-            color: #16a34a; /* Green text */
-            background-color: #dcfce7; /* Light green background */
-            padding: 1rem; /* Padding */
-            border-radius: 0.5rem; /* Rounded corners */
-            margin-top: 1rem; /* Space above */
-            border: 1px solid #22c55e; /* Green border */
+            color: #16a34a;
+            background-color: #dcfce7;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            border: 1px solid #22c55e;
         }
-        /* Responsive adjustments for smaller screens */
+        .chart-container {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #f9fafb;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+        }
+        .strategy-params {
+            margin-top: 1rem;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background-color: #f9fafb;
+            transition: opacity 0.3s ease;
+        }
+        .hidden {
+            display: none;
+        }
         @media (max-width: 640px) {
             .container {
-                padding: 1.5rem; /* Smaller padding on small screens */
+                padding: 1.5rem;
             }
             .form-group {
-                margin-bottom: 1rem; /* Smaller margin for form groups */
+                margin-bottom: 1rem;
             }
             .form-group label {
-                margin-bottom: 0.25rem; /* Smaller margin for labels */
+                margin-bottom: 0.25rem;
             }
             .form-group input[type="number"],
-            .form-group input[type="file"] {
-                padding: 0.6rem; /* Smaller input padding */
-                font-size: 0.9rem; /* Smaller input font size */
+            .form-group input[type="file"],
+            .form-group select {
+                padding: 0.6rem;
+                font-size: 0.9rem;
             }
             .submit-button {
-                padding: 0.6rem 1.2rem; /* Smaller button padding */
-                font-size: 1rem; /* Smaller button font size */
-                width: 100%; /* Full width button on small screens */
+                padding: 0.6rem 1.2rem;
+                font-size: 1rem;
+                width: 100%;
             }
             .results-section h2 {
-                font-size: 1.5rem; /* Smaller heading font size */
+                font-size: 1.5rem;
             }
             .results-section p {
-                font-size: 1rem; /* Smaller paragraph font size */
+                font-size: 1rem;
+            }
+            .strategy-params {
+                padding: 0.75rem;
             }
         }
     </style>
@@ -134,9 +154,8 @@
 <body>
     <div class="container">
         <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Backtrader Flask Application</h1>
-        <p class="text-center text-gray-600 mb-8">Upload historical stock data (CSV) and run a simple SMA Crossover backtest.</p>
+        <p class="text-center text-gray-600 mb-8">Upload historical stock or futures data (CSV), select a trading strategy, and run a backtest.</p>
 
-        <!-- Form for file upload and parameter input -->
         <form action="/run_backtest" method="post" enctype="multipart/form-data" class="space-y-6">
             <div class="form-group">
                 <label for="data_file" class="block text-sm font-medium text-gray-700">Upload CSV Data:</label>
@@ -144,22 +163,119 @@
                        class="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none focus:border-blue-500">
                 <p class="mt-1 text-xs text-gray-500">
                     Expected CSV columns (case-sensitive): <strong>Date, Open, High, Low, Close, Volume, OpenInterest</strong>.
-                    Ensure 'Date' column is in a parseable format (e.g., YYYY-MM-DD).
+                    OpenInterest is optional. Ensure 'Date' column is in a parseable format (e.g., YYYY-MM-DD).
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="form-group">
-                    <label for="fast_period" class="block text-sm font-medium text-gray-700">Fast SMA Period:</label>
-                    <input type="number" name="fast_period" id="fast_period" value="10" min="1" required
-                           class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                </div>
+            <div class="form-group">
+                <label for="strategy" class="block text-sm font-medium text-gray-700">Trading Strategy:</label>
+                <select name="strategy" id="strategy" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    <option value="sma_crossover">SMA Crossover</option>
+                    <option value="ema_crossover">EMA Crossover</option>
+                    <option value="rsi">RSI Mean Reversion</option>
+                    <option value="bollinger_bands">Bollinger Bands Breakout</option>
+                    <option value="macd">MACD Crossover</option>
+                    <option value="breakout">Price Channel Breakout</option>
+                </select>
+            </div>
 
+            <div id="params-sma_crossover" class="strategy-params">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label for="sma_fast_period" class="block text-sm font-medium text-gray-700">Fast SMA Period:</label>
+                        <input type="number" name="sma_fast_period" id="sma_fast_period" value="10" min="1" required
+                               class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    <div class="form-group">
+                        <label for="sma_slow_period" class="block text-sm font-medium text-gray-700">Slow SMA Period:</label>
+                        <input type="number" name="sma_slow_period" id="sma_slow_period" value="30" min="1" required
+                               class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                </div>
+            </div>
+
+            <div id="params-ema_crossover" class="strategy-params hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label for="ema_fast_period" class="block text-sm font-medium text-gray-700">Fast EMA Period:</label>
+                        <input type="number" name="ema_fast_period" id="ema_fast_period" value="10" min="1" required
+                               class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    <div class="form-group">
+                        <label for="ema_slow_period" class="block text-sm font-medium text-gray-700">Slow EMA Period:</label>
+                        <input type="number" name="ema_slow_period" id="ema_slow_period" value="30" min="1" required
+                               class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                </div>
+            </div>
+
+            <div id="params-rsi" class="strategy-params hidden">
                 <div class="form-group">
-                    <label for="slow_period" class="block text-sm font-medium text-gray-700">Slow SMA Period:</label>
-                    <input type="number" name="slow_period" id="slow_period" value="30" min="1" required
+                    <label for="rsi_period" class="block text-sm font-medium text-gray-700">RSI Period:</label>
+                    <input type="number" name="rsi_period" id="rsi_period" value="14" min="1" required
                            class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                 </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label for="oversold" class="block text-sm font-medium text-gray-700">RSI Oversold Threshold:</label>
+                        <input type="number" name="oversold" id="oversold" value="30" min="0" max="100" required
+                               class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    <div class="form-group">
+                        <label for="overbought" class="block text-sm font-medium text-gray-700">RSI Overbought Threshold:</label>
+                        <input type="number" name="overbought" id="overbought" value="70" min="0" max="100" required
+                               class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                </div>
+            </div>
+
+            <div id="params-bollinger_bands" class="strategy-params hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label for="bb_period" class="block text-sm font-medium text-gray-700">Bollinger Bands Period:</label>
+                        <input type="number" name="bb_period" id="bb_period" value="20" min="1" required
+                               class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    <div class="form-group">
+                        <label for="devfactor" class="block text-sm font-medium text-gray-700">Standard Deviation Multiplier:</label>
+                        <input type="number" step="0.1" name="devfactor" id="devfactor" value="2.0" min="0.1" required
+                               class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                </div>
+            </div>
+
+            <div id="params-macd" class="strategy-params hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label for="macd_fast_period" class="block text-sm font-medium text-gray-700">MACD Fast EMA Period:</label>
+                        <input type="number" name="macd_fast_period" id="macd_fast_period" value="12" min="1" required
+                               class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    <div class="form-group">
+                        <label for="macd_slow_period" class="block text-sm font-medium text-gray-700">MACD Slow EMA Period:</label>
+                        <input type="number" name="macd_slow_period" id="macd_slow_period" value="26" min="1" required
+                               class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="macd_signal_period" class="block text-sm font-medium text-gray-700">MACD Signal Period:</label>
+                    <input type="number" name="macd_signal_period" id="macd_signal_period" value="9" min="1" required
+                           class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                </div>
+            </div>
+
+            <div id="params-breakout" class="strategy-params hidden">
+                <div class="form-group">
+                    <label for="lookback" class="block text-sm font-medium text-gray-700">Breakout Lookback Period:</label>
+                    <input type="number" name="lookback" id="lookback" value="20" min="1" required
+                           class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="risk_free_rate" class="block text-sm font-medium text-gray-700">Risk-Free Rate (%):</label>
+                <input type="number" step="0.01" name="risk_free_rate" id="risk_free_rate" value="3.0" min="0" required
+                       class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
             </div>
 
             <div class="flex justify-center mt-8">
@@ -167,33 +283,172 @@
             </div>
         </form>
 
-        <!-- Display results section if results are available -->
         {% if results %}
             <div class="results-section">
                 {% if results.error %}
-                    <!-- Error message display -->
                     <div class="error-message">
                         <p class="font-bold">Error:</p>
                         <p>{{ results.message }}</p>
                     </div>
                 {% else %}
-                    <!-- Success message and backtest summary -->
                     <div class="success-message">
-                        <p class="font-bold">Backtest Results:</p>
+                        <p class="font-bold">Backtest Results ({{ results.strategy_name }}):</p>
                         <p>{{ results.message }}</p>
                     </div>
                     <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                         <h3 class="text-xl font-semibold text-gray-800 mb-2">Summary:</h3>
-                        <p><strong>Initial Portfolio Value:</strong> {{ results.initial_value }}</p>
-                        <p><strong>Final Portfolio Value:</strong> {{ results.final_value }}</p>
+                        <p><strong>Initial Portfolio Value ({{ results.start_date }}):</strong> {{ results.initial_value }}</p>
+                        <p><strong>Final Portfolio Value ({{ results.end_date }}):</strong> {{ results.final_value }}</p>
                         <p><strong>Profit/Loss:</strong> {{ results.profit }}</p>
                         <p><strong>Profit/Loss Percentage:</strong> {{ results.profit_percent }}</p>
-                        <p><strong>Fast SMA Period:</strong> {{ results.fast_period }}</p>
-                        <p><strong>Slow SMA Period:</strong> {{ results.slow_period }}</p>
+                        {% if results.sma_fast_period %}
+                            <p><strong>Fast SMA Period:</strong> {{ results.sma_fast_period }}</p>
+                        {% endif %}
+                        {% if results.sma_slow_period %}
+                            <p><strong>Slow SMA Period:</strong> {{ results.sma_slow_period }}</p>
+                        {% endif %}
+                        {% if results.ema_fast_period %}
+                            <p><strong>Fast EMA Period:</strong> {{ results.ema_fast_period }}</p>
+                        {% endif %}
+                        {% if results.ema_slow_period %}
+                            <p><strong>Slow EMA Period:</strong> {{ results.ema_slow_period }}</p>
+                        {% endif %}
+                        {% if results.rsi_period %}
+                            <p><strong>RSI Period:</strong> {{ results.rsi_period }}</p>
+                        {% endif %}
+                        {% if results.oversold %}
+                            <p><strong>Oversold Threshold:</strong> {{ results.oversold }}</p>
+                        {% endif %}
+                        {% if results.overbought %}
+                            <p><strong>Overbought Threshold:</strong> {{ results.overbought }}</p>
+                        {% endif %}
+                        {% if results.bb_period %}
+                            <p><strong>Bollinger Bands Period:</strong> {{ results.bb_period }}</p>
+                        {% endif %}
+                        {% if results.devfactor %}
+                            <p><strong>Standard Deviation Multiplier:</strong> {{ results.devfactor }}</p>
+                        {% endif %}
+                        {% if results.macd_fast_period %}
+                            <p><strong>MACD Fast EMA Period:</strong> {{ results.macd_fast_period }}</p>
+                        {% endif %}
+                        {% if results.macd_slow_period %}
+                            <p><strong>MACD Slow EMA Period:</strong> {{ results.macd_slow_period }}</p>
+                        {% endif %}
+                        {% if results.macd_signal_period %}
+                            <p><strong>MACD Signal Period:</strong> {{ results.macd_signal_period }}</p>
+                        {% endif %}
+                        {% if results.lookback %}
+                            <p><strong>Breakout Lookback Period:</strong> {{ results.lookback }}</p>
+                        {% endif %}
+                        <p><strong>Risk-Free Rate:</strong> {{ results.risk_free_rate }}</p>
+                        <p><strong>Sharpe Ratio:</strong> {{ results.sharpe_ratio }}</p>
                     </div>
+                    <div class="chart-container">
+                        <canvas id="equityChart"></canvas>
+                    </div>
+                    <script>
+                        const ctx = document.getElementById('equityChart').getContext('2d');
+                        new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: {{ results.chart_data.labels | tojson }},
+                                datasets: [
+                                    {
+                                        label: 'Portfolio Equity',
+                                        data: {{ results.chart_data.equity | tojson }},
+                                        borderColor: '#3b82f6',
+                                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                        fill: false,
+                                        tension: 0.1
+                                    },
+                                    {
+                                        label: 'Buy Signals',
+                                        data: {{ results.chart_data.buy_signals | tojson }},
+                                        type: 'scatter',
+                                        borderColor: '#16a34a',
+                                        backgroundColor: '#16a34a',
+                                        pointStyle: 'triangle',
+                                        pointRadius: 8,
+                                        showLine: false
+                                    },
+                                    {
+                                        label: 'Sell Signals',
+                                        data: {{ results.chart_data.sell_signals | tojson }},
+                                        type: 'scatter',
+                                        borderColor: '#dc2626',
+                                        backgroundColor: '#dc2626',
+                                        pointStyle: 'triangle',
+                                        pointRadius: 8,
+                                        showLine: false
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                scales: {
+                                    x: {
+                                        title: { display: true, text: 'Date' },
+                                        ticks: { maxTicksLimit: 10 }
+                                    },
+                                    y: {
+                                        title: { display: true, text: 'Portfolio Value ($)' },
+                                        beginAtZero: false
+                                    }
+                                },
+                                plugins: {
+                                    legend: { display: true },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                let label = context.dataset.label || '';
+                                                if (label) {
+                                                    label += ': ';
+                                                }
+                                                if (context.parsed.y !== null) {
+                                                    if (context.dataset.label.includes('Signals')) {
+                                                        label += `$${context.parsed.y.toFixed(2)}`;
+                                                    } else {
+                                                        label += `$${context.parsed.y.toFixed(2)}`;
+                                                    }
+                                                }
+                                                return label;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    </script>
                 {% endif %}
             </div>
         {% endif %}
     </div>
+    <script>
+        function toggleParameters() {
+            const strategy = document.getElementById('strategy').value;
+            const paramDivs = document.querySelectorAll('.strategy-params');
+            paramDivs.forEach(div => {
+                div.classList.add('hidden');
+            });
+            const activeDiv = document.getElementById('params-' + strategy);
+            if (activeDiv) {
+                activeDiv.classList.remove('hidden');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleParameters();
+            const strategy = document.getElementById('strategy');
+            if (strategy) {
+                strategy.addEventListener('change', toggleParameters);
+            }
+        });
+    </script>
+    <script>
+        // Ensure the correct strategy parameters are shown on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleParameters();
+        });
+    </script>
 </body>
 </html>
